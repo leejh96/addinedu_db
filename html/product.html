@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>
+        <%=title%>
+    </h1>
+    <table width='80%' cellpadding='0' border="1">
+        <colgroup>
+            <col width='50%'>
+            <col width='50%'>
+        </colgroup>
+        <thead>
+            <tr>
+                <th>제품명</th>
+                <th>가격</th>
+            </tr>
+        </thead>
+        <tbody align="center">
+            <%for(let i of product) {%>
+                <tr>
+                    <td>
+                        <%=i.product_name%>
+                    </td>
+                    <td>
+                        <%=i.product_price%>
+                    </td>
+                </tr>
+                <%}%>
+        </tbody>
+    </table>
+</body>
+
+</html>

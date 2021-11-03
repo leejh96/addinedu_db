@@ -8,12 +8,14 @@ const port = 4000;
 const server = http.createServer((req, res) => {
     fs.readFile('html/test_ejs.html', 'utf-8', (e, data) => {
         res.writeHead(200, { 'Content-Type': 'text/html' })
-        res.end(ejs.render(data, {
+        const result = ejs.render(data, {
             title: 'ejs 엔진으로 렌더링하기',
             name: '홍길동',
             email: 'hong@gildong.com',
             favorite: ['런닝맨', '오징어게임', '놀면뭐하니', '뭉쳐야찬다']
-        }))
+        })
+        console.log(result)
+        res.end(result)
     })
 });
 
