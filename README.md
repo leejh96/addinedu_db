@@ -89,17 +89,17 @@ select distinct owner from pet;
 => 만약 distinct 뒤에 복수의 필드라면 두 개의 데이터를 모두가 다른것만 출력한다.
 => 서브쿼리 차원에서 많이 사용
 
+select name, birth from pet order by birth;
+=> 생년월일을 오름차순으로 정렬하여 표현
+=> order by 뒤에 복수의 필드라면 앞에 것을 적용하고 뒤에 것을 적용함
+```
+
 ex) select distinct name, species from pet;
 |이름|종류|
 |:---:|:---:|
 |lee|dog|
 |lee|cat|
-=>(lee, dog) 데이터와 (lee, cat)은 두개의 데이터 모두가 다르지 않기 때문에 모두 출력됨
-
-select name, birth from pet order by birth;
-=> 생년월일을 오름차순으로 정렬하여 표현
-=> order by 뒤에 복수의 필드라면 앞에 것을 적용하고 뒤에 것을 적용함
-```
+=> (lee, dog) 데이터와 (lee, cat)은 두개의 데이터 모두가 다르지 않기 때문에 모두 출력됨
 
 #### CREATE
 ```
