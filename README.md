@@ -2,7 +2,7 @@
 
 - 대량의 데이터 저장소
     - 일관성 : 데이터를 파일로 저장하게 되어 특정 파일에 실수로 데이터를 고치지 못했을 경우 일관성이 깨졌다고 할 수 있음
-    - 무결성
+    - 무결성 : 한쪽 데이터가 바뀌었을 경우 같은 참조하는 다른 데이터도 함께 바뀌는 성질
 
 ## 환경변수 설정하기
 - 환경변수 : OS마다 변수가 있는데 이 변수에 값을 넣고 이 값을 읽어서 쓸 수 있음
@@ -56,15 +56,26 @@ desc 테이블명;
 ```
 
 #### SELECT
-#### 기본 SELECT문
+##### 모든 테이블 정보를 보는 SELECT문
+- information_schema를 사용  => 딕셔너리
 ```
-select 필드명 or * from 테이블명;
+use infomation_schema;
+SELECT * from tables;
+=> 모든 DB에 table 내용 확인
+
+SELECT * FROM table_constraints;
+=> 모든 DB table에 제약조건 확인
+```
+
+##### 기본 SELECT문
+```
+SELECT 필드명 or * from 테이블명;
 =>테이블 데이터 확인
 ```
 
 ##### 날짜 관련 SELECT문
 ```
-select current_date;
+SELECT current_date;
 => 현재날짜 확인 
 
 SELECT CURDATE();
@@ -86,37 +97,37 @@ SELECT MONTH(특정날짜 및 필드값) FROM 테이블명;
 => year, day, weekday(요일(0~6으로 표현)), dayofweek(1~7로 표현) 등도 사용가능
 ```
 
-#### 정렬 관련 SELECT문
+##### 정렬 관련 SELECT문
 ```
-select name, birth from pet order by birth;
+SELECT name, birth from pet order by birth;
 => 생년월일을 오름차순으로 정렬하여 표현
 => order by 뒤에 복수의 필드라면 앞에 것을 적용하고 뒤에 것을 적용함
 ```
 
-#### 조건 관련 SELECT문
+##### 조건 관련 SELECT문
 ```
-select 필드명 from 테이블명 where 조건식;
+SELECT 필드명 from 테이블명 where 조건식;
 => 검색조건 주고 데이터확인
 => <, >, =(db에서는 같다가 =하나임), >=, <=, and, or, not
 
-select *, sal+ifnull(comm, 0) from emp;
+SELECT *, sal+ifnull(comm, 0) from emp;
 => ifnull(검사하고자 하는 필드, 필드값이 널이 아닐때 대체값)
 => 만약 comm 필드의 값이 null이라면 0을 넣고 계산
 
-select * from 테이블 where 필드명 is null(is not null);
+SELECT * from 테이블 where 필드명 is null(is not null);
 => 필드값이 null값인 것(아닌것) 조회
 => null값에 대해서는 =를 사용할 수 없음
 
-select * from 테이블 where 필드명 like 'a%'
+SELECT * from 테이블 where 필드명 like 'a%'
 => 필드명이 a로 시작하는 것 조회
 => %는 여러글자를 대체,  _는 한글자를 대체함 
 
-select distinct owner from pet;
+SELECT distinct owner from pet;
 => 중복을 제거한 주인 목록 확인
 => 만약 distinct 뒤에 복수의 필드라면 두 개의 데이터를 모두가 다른것만 출력한다.
 => 서브쿼리 차원에서 많이 사용
 ```
-ex) select distinct name, species from pet;
+ex) SELECT distinct name, species from pet;
 |이름|종류|
 |:---:|:---:|
 |lee|dog|
@@ -124,27 +135,136 @@ ex) select distinct name, species from pet;
 
 => (lee, dog) 데이터와 (lee, cat)은 두개의 데이터 모두가 다르지 않기 때문에 모두 출력됨
 
-#### 내장 함수 SELECT문
+##### 그룹함수
+- count, sum, max, min 
+- 전체 데이터를 대상으로 합계 구하기
+
+###### count
 ```
-select version();
+SELECT count(*) as cnt from member where userid= 1;
+=> userid 값이 1인 값을 cnt라는 필드이름으로 갯수 세기
+=> *에는 필드명이 들어갈 수 있고 갯수를 셀 때 NULL값은 제외하고 센다.
+```
+
+###### sum
+```
+SELECT sum(price) from buytbl;
+=> 가격의 합 계산
+```
+
+###### max
+```
+SELECT max(price) from buytbl;
+=> 가격 최대값 계산
+```
+
+###### min
+```
+SELECT min(price) from buytbl;
+=> 가격 최솟값 계산
+```
+
+###### GROUP BY
+```
+SELECT userid, COUNT(*) FROM buytbl
+GROUP BY userid;
+```
+
+##### 내장 함수 SELECT문
+```
+SELECT version();
 => 버전확인
 
-select sin(30);, select pi();, select (4+3)*2; ...
+SELECT sin(30);, SELECT pi();, SELECT (4+3)*2; ...
 => 수학함수 사용
 
-select user():
+SELECT user():
 => user 데이터 확인
 
 SELECT empno, ename, CONCAT('연 봉', ' ',sal * 12 ) AS 연봉  FROM emp;
 => 문자열이나 필드를 연결하기 위해서는 concat 사용
 
-select count(*) as cnt from member where userid= 1;
-=> userid 값이 1인 값을 cnt라는 필드이름으로 갯수 세기
-
 SELECT COUNT(*) FROM employees WHERE gender = 'f' AND (YEAR(hire_date) = 1987 OR YEAR(hire_date) = 1989);
 SELECT COUNT(*) FROM employees WHERE gender = 'f' AND (substring(hire_date, 1, 4) = 1987 OR substring(hire_date,1,4) = 1989);
 => 위아래 쿼리는 같은 결과를 냄
 => substring함수는 첫번째 인자로 값, 두번째인자로 시작 위치, 세번째인자로 잘라 낼 갯수를 의미
+```
+
+##### Join 연산
+- inner join : 양쪽 테이블에서 데이터가 공통으로 있어야 출력
+- outer join 
+    - left outer join : 왼쪽의 데이터가 모두 나옴
+    - right outer join : 오른쪽 데이터가 모두 나옴
+    - full outer join : 양쪽 데이터가 모두 나옴
+    - from 절에 있는 데이터가 left 방향에 해당함
+- join할 테이블이 여러개인 경우는 쿼리문에 join 쿼리를 계속 사용해주면 된다.
+
+###### INNER JOIN
+```
+SELECT empno, ename, dname
+FROM emp
+INNER JOIN dept ON emp.deptno=dept.deptno;
+=> emp와 dept를 inner join 하되 on조건을 만족시키는 값을 조인하라
+```
+
+###### LEFT OUTER JOIN
+```
+SELECT empno, ename, dname
+FROM emp
+LEFT OUTER JOIN dept ON emp.deptno=dept.deptno;
+=> emp와 dept를 join 하되 left에 해당하는 emp 데이터는 모두 출력하면서 그 중 on조건이 만족하지 않으면 null이 출력
+```
+
+###### RIGHT OUTER JOIN
+```
+SELECT empno, ename, dname
+FROM emp
+RIGHT OUTER JOIN dept ON emp.deptno=dept.deptno;
+=> emp와 dept를 inner join 하되 right에 해당하는 dept 데이터는 모두 출력하면서 그 중 on조건이 만족하지 않으면 null이 출력
+```
+
+###### SELF JOIN
+- 나와 나를 join
+```
+SELECT a.ename, b.ename AS mgr 
+FROM emp AS a
+LEFT OUTER JOIN emp AS b ON a.mgr = b.empno;
+=> 테이블 명이 같으면 충돌이 나기 때문에 앞에 테이블명을 붙여야함
+```
+
+##### 서브쿼리
+- 쿼리 내에서 실행되는(먼저 실행됨) 쿼리
+- 서브쿼리가 먼저 실행되고 그 결과값을 가지고 주쿼리가 실행됨
+- 서브쿼리는 select, from, where 어디나 올 수 있음
+- select 절에는 서브쿼리의 수행결과가 한개 또는 null 인 것만 올 수 있음
+- from은 상관 없고, where 절은 한개올 때와 여러개 올 때 처리가 다름
+
+###### 서브쿼리(SELECT)
+```
+SELECT num, userid, (SELECT NAME FROM usertbl WHERE userid=a.userid), prodname, price
+FROM buytbl as a;
+=> join과 서브쿼리가 결과가 비슷하지만 원칙적으로join이 가능할 경우 join을 사용함
+```
+
+###### 서브쿼리(FROM)
+```
+SELECT *
+FROM (
+	SELECT num,a.userID, NAME, prodName, price
+	FROM buytbl AS a
+	LEFT outer JOIN usertbl AS b
+	ON a.userID = b.userID
+) AS a
+WHERE a.userid='kbs' OR a.userid='jyp' 
+=> FROM 안에 쿼리문 결과를 하나의 테이블로 봐서 select문을 실행한다고 생각
+```
+
+###### 서브쿼리(WHERE)
+```
+SELECT empno, ename
+FROM emp
+WHERE deptno = (SELECT deptno FROM emp WHERE sal=(SELECT MAX(sal) FROM emp);
+=> 최대 급여를 받은 사람이 있는 부서와 같은 부서에서 일하는 사람들
 ```
 
 #### CREATE
@@ -157,7 +277,6 @@ create table board(
     wdate date
 );
 => 테이블 생성
-
 ```
 
 #### INSERT
@@ -178,6 +297,24 @@ update 테이블 set 필드네임1='데이터1', 필드네임2='데이터2' wher
 delete from 테이블 where id=${id}
 => 특정 데이터 삭제
 => where 없을 시 모든 데이터 삭제
+```
+
+#### ALTER
+```
+alter table 테이블명 drop primary key;
+=> primary key 삭제 
+
+alter table 테이블명 add primary key(컬럼명, 컬럼명);
+=> primary key 추가하기
+
+ALTER TABLE 테이블명
+ADD CONSTRAINT 제약조건이름 
+FOREIGN KEY 참조필드명 
+REFERENCES 참조테이블(참조컬럼);
+=> 특정 테이블 FOREIGN KEY 설정
+=> FOREIGN KEY 설정 시 해당 필드는 primary key이나 unique 여야 함
+=> 위 경우에 참조되는 테이블(REFERENCES 값)의 데이터는 함부로 삭제 불가능하며 테이블도 삭제 불가능하다.
+=> 또한 변경될 테이블에도 참조하는 테이블에 없는 데이터는 삽입할 수 없음 (CONSTRAINT로 제약조건을 걸었기 때문)
 ```
 
 ## Ajax
