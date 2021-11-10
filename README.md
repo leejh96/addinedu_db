@@ -196,7 +196,7 @@ SELECT COUNT(*) FROM employees WHERE gender = 'f' AND (substring(hire_date, 1, 4
     - left outer join : 왼쪽의 데이터가 모두 나옴
     - right outer join : 오른쪽 데이터가 모두 나옴
     - full outer join : 양쪽 데이터가 모두 나옴
-    - from 절에 있는 데이터가 left 방향에 해당함
+    - from 절에 가까이 있는 데이터가 left 방향에 해당함
 - join할 테이블이 여러개인 경우는 쿼리문에 join 쿼리를 계속 사용해주면 된다.
 
 ###### INNER JOIN
@@ -268,6 +268,7 @@ WHERE deptno = (SELECT deptno FROM emp WHERE sal=(SELECT MAX(sal) FROM emp);
 ```
 
 #### CREATE
+- AUTO_INCREMENT 는 해당 필드가 반드시 PRIMARY KEY 여야 함
 ```
 create table board(
     id int,
