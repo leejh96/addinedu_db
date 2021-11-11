@@ -36,7 +36,6 @@ router.get("/list", (request, response) => {
 router.get("/list/:page", (request, response) => {
   const page = request.params.page;
   pool.getConnection(function (err, connection) {
-
     const sql = `select id, title, author, publisher, 
          publish_year, price, date_format(wdate, '%Y-%m-%d') wdate 
          from book

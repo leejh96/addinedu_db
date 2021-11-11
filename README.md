@@ -4,6 +4,11 @@
     - 일관성 : 데이터를 파일로 저장하게 되어 특정 파일에 실수로 데이터를 고치지 못했을 경우 일관성이 깨졌다고 할 수 있음
     - 무결성 : 한쪽 데이터가 바뀌었을 경우 같은 참조하는 다른 데이터도 함께 바뀌는 성질
 
+- DDL : 테이블 자체를 만들고 수정, 삭제와 관련된 언어
+    - Ex) CREATE, ALTER, TRUNCATE, DROP...
+- DML : 테이블내의 데이터를 수정하고 삭제하고 추가하고 조회하는 언어
+    - Ex) SELECT, INSERT, UPDATE, DELETE
+
 ## 환경변수 설정하기
 - 환경변수 : OS마다 변수가 있는데 이 변수에 값을 넣고 이 값을 읽어서 쓸 수 있음
     - mariadb를 실행하기 위해서는 해당폴더를 직접 cd명령어로 찾아야하지만 path변수에 해당경로를 넣어주면 직접 찾아가지 않고 실행 가능
@@ -34,8 +39,12 @@
 ### MySQL 자료형
 - int : 정수형 데이터 자료형
 - varchar : **var**iant **char**로 가변길이 문자열, 크기가 최대크기를 의미하고 실제 데이터 만큼의 크기만 갖고있음
+    - varchar는 메모리를 효율적으로 사용하긴 하지만 속도가 빠르지는 않음
+    - 한번에 많이 줄 경우 단편화가 발생할 수 있음
 - char : 고정길이 문자열, 정해진 자리수만큼 자리를 차지
 - null : 데이터를 정의할 수 없음, 연산 불가능
+- float : 실수형태의 데이터 => 10진수에서 2진수로 변환시 약간의 데이터 손실
+- decimal : 실수형태의 데이터 => 10진수에서 2진수로 변환시 데이터 손실x
 
 ### MySQL 테이블 명령어
 - 명령어 입력 시 대소문자 구별하지 않음
@@ -57,7 +66,7 @@ desc 테이블명;
 
 #### SELECT
 ##### 모든 테이블 정보를 보는 SELECT문
-- information_schema를 사용  => 딕셔너리
+- information_schema를 사용 => 딕셔너리
 ```
 use infomation_schema;
 SELECT * from tables;
@@ -184,10 +193,51 @@ SELECT user():
 SELECT empno, ename, CONCAT('연 봉', ' ',sal * 12 ) AS 연봉  FROM emp;
 => 문자열이나 필드를 연결하기 위해서는 concat 사용
 
+SELECT CONCAT('-','2021','11','11' ); // 2021-11-11
+=> 문자열 사이사이를 첫번째 인수로 구분
+
 SELECT COUNT(*) FROM employees WHERE gender = 'f' AND (YEAR(hire_date) = 1987 OR YEAR(hire_date) = 1989);
 SELECT COUNT(*) FROM employees WHERE gender = 'f' AND (substring(hire_date, 1, 4) = 1987 OR substring(hire_date,1,4) = 1989);
 => 위아래 쿼리는 같은 결과를 냄
 => substring함수는 첫번째 인자로 값, 두번째인자로 시작 위치, 세번째인자로 잘라 낼 갯수를 의미
+
+SELECT CAST('2020-10-19 12:35:29.123' AS DATE); // 2020-10-19
+SELECT CAST('2020-10-19 12:35:29.123' AS TIME); // 12:35:29
+SELECT CAST('2020-10-19 12:35:29.123' AS DATETIME); // 2020-10-19 12:35:29
+=> 형전환 함수(CAST)
+
+set @myval=10;
+=> 변수 선언
+
+SELECT ename, case 필드명 when 조건 then 값
+						  when 조건 then 값
+					      when 조건 then 값
+						  when 조건 then 값
+						  when 조건 then 값
+						  ELSE 값
+			  END AS dname
+FROM emp;
+=> 필드의 값에 따라 then으로 값을 넣어줄 수 있음
+
+Ex)
+SELECT ename, case when sal>= 4000 then 'A'
+								  when 20 then 'B'
+								  when 30 then 'C'
+								  ELSE 'D'
+					END grade
+FROM emp;
+=> 조건안에 필드가 들어가는 경우 case옆에 필드명을 안줘도 됨
+
+SELECT ASCII('A');
+=> 아스키 코드값 출력
+
+SELECT CHAR(56);
+=> 아스키코드값으로 문자 출력
+
+SELECT BIT_LENGTH('abc'), CHAR_LENGTH('abc'), LENGTH('abc');
+=> BIT_LENGTH는 데이터 저장에 필요한 비트 수
+=> CHAR_LENGTH는 문자열 길이
+=> LENGTH는 차지하는 byte 수
 ```
 
 ##### Join 연산
@@ -278,44 +328,132 @@ create table board(
     wdate date
 );
 => 테이블 생성
+
+
+CREATE TABLE emp2 AS SELECT * FROM emp;
+=> emp의 모든 데이터와 구조를 emp2 복사
+=> 제약조건은 복사 안됨
+
+CREATE TABLE emp3 AS SELECT ename, sal FROM emp where deptno=10;
+=> emp의 특정 데이터와 구조만 emp3에 복사
+
+CREATE TABLE emp4 as SELECT * FROM emp where false;
+=> emp 테이블의 구조만 복사
 ```
 
 #### INSERT
 ```
-insert into board values(1, '게시글1', '내용1', '작성자1', now());
+INSERT INTO board VALUES(1, '게시글1', '내용1', '작성자1', NOW());
 => 테이블 데이터 넣기
 => 만든 테이블의 필드 순서를 맞춰야 한다.
 ```
 
 #### UPDATE
 ```
-update 테이블 set 필드네임1='데이터1', 필드네임2='데이터2' where 조건= 값;
+UPDATE 테이블 SET 필드네임1='데이터1', 필드네임2='데이터2' WHERE 조건= 값;
 => 특정 데이터 값 수정
+=> WHERE 값이 없다면 모든 값이 변경
 ```
 
 #### DELETE
 ```
-delete from 테이블 where id=${id}
+DELETE FROM 테이블 WHERE id=${id}
 => 특정 데이터 삭제
-=> where 없을 시 모든 데이터 삭제
+=> WHERE 없을 시 모든 데이터 삭제
 ```
 
 #### ALTER
 ```
-alter table 테이블명 drop primary key;
-=> primary key 삭제 
-
-alter table 테이블명 add primary key(컬럼명, 컬럼명);
-=> primary key 추가하기
-
 ALTER TABLE 테이블명
-ADD CONSTRAINT 제약조건이름 
-FOREIGN KEY 참조필드명 
-REFERENCES 참조테이블(참조컬럼);
-=> 특정 테이블 FOREIGN KEY 설정
-=> FOREIGN KEY 설정 시 해당 필드는 primary key이나 unique 여야 함
+ADD CONSTRAINT 제약조건이름 => 생략가능(알아서 생성)
+FOREIGN KEY(PRIMARY KEY) 참조필드명 
+REFERENCES 참조테이블(참조컬럼); => FOREIGN KEY 지정시 사용
+=> 특정 테이블 FOREIGN KEY(PRIMARY KEY) 설정
+=> FOREIGN KEY 설정 시 해당 필드는 PRIMARY KEY이나 UNIQUE 여야 함
 => 위 경우에 참조되는 테이블(REFERENCES 값)의 데이터는 함부로 삭제 불가능하며 테이블도 삭제 불가능하다.
 => 또한 변경될 테이블에도 참조하는 테이블에 없는 데이터는 삽입할 수 없음 (CONSTRAINT로 제약조건을 걸었기 때문)
+
+ALTER TABLE 테이블명 ADD PRIMARY KEY(컬럼명, 컬럼명);
+=> primary key 추가하기
+
+ALTER TABLE 테이블명 DROP PRIMARY KEY;
+=> primary key 삭제
+
+ALTER TABLE 테이블명 DROP FOREIGN KEY;
+=> foreign key 삭제 
+
+ALTER TABLE emp3 ADD COLUMN read_yn CHAR(1);
+=> emp3 테이블에 read_yn 필드 추가
+
+ALTER TABLE emp3 DROP COLUMN read_yn CHAR(1);
+=> emp3 테이블에 read_yn 필드 삭제
+
+ALTER TABLE emp3 MODIFY COLUMN hiredate VARCHAR(20);
+=> emp3 테이블의 컬럼 수정
+```
+
+#### DROP
+```
+DROP TABLE 테이블명;
+=> 해당 테이블 삭제
+
+DROP DATABASE DB명;
+=> 해당 데이터베이스 삭제
+```
+
+#### TRUNCATE
+```
+TRUNCATE TABLE 테이블명;
+=> 테이블 구조만 남기고 모든 데이터 삭제
+```
+
+### Transaction(트랜잭션)
+- 필요한  동작이 하나의 목적을 위해 한꺼번에 수행되는 것
+- Ex) 은행 A DB에서 돈이 나갔음을 저장하면서 은행 B DB에는 입금되었음을 저장
+- DDL은 복구 불가능하고 DML(insert, delete, update)은 필요에 의해 복구할 수 있음
+
+#### autocommit 변수 사용
+```
+SHOW VARIABLES LIKE 'autocommit%';
+=> 변수의 현재 상태를 보는 쿼리
+SET autocommit = FALSE;
+=> 변수 값을 설정(false일 경우 off로 저장 default 는 on)
+INSERT INTO emp(empno, ename) VALUES (8004, '둘리');
+=> 위에서 autocommit을 false로 줬기 때문에 불완전상태
+(즉, 바로 적용되지 않은 상태라 생각, git에서 add와 비슷함) 
+SELECT * FROM emp; 
+=> insert한 값이 보여짐
+ROLLBACK;(commit;)
+=> 내용 원상복구, 만약 불완전상태를 그냥 확정시키고 싶다면 commit 사용
+SELECT * FROM emp;
+=> ROLLBACK 하여 insert 전으로 되돌아옴
+```
+
+#### START TRANSACTION 사용
+```
+START TRANSACTION;
+=> commit 이나 rollback 하기 전까지 불확정 상태
+SELECT * FROM emp2;
+DELETE FROM emp2;
+SELECT * FROM emp2;
+ROLLBACK ; => delete 한 값 복구
+SELECT * FROM emp2;
+```
+
+### MySQL 변수 선언
+```
+SET @mybal= 1;
+SET @a = 5;
+=> 변수 선언 @있어야함
+
+SELECT @mybal;
+SELECT @a;
+=> 변수 확인
+
+PREPARE myQuery FROM 'SELECT * FROM 테이블 WHERE 필드명=? and 필드명=?';
+EXECUTE myQuery USING @a @mybal;
+=> PREPARE로 쿼리를 myQuery에 저장해놓고
+EXECUTE로 실행시키는데 ?에는 USING에 사용한 변수를 넣음
 ```
 
 ## Ajax
