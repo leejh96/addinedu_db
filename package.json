@@ -9,6 +9,6 @@
     "nodemon": "^2.0.14"
   },
   "scripts": {
-    "start": "nodemon day5/score"
+    "start": "nodemon test/add"
   }
 }

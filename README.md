@@ -104,6 +104,15 @@ SELECT LAST_DAY('해당날짜');
 SELECT MONTH(특정날짜 및 필드값) FROM 테이블명;
 => 해당 필드값의 월을 가져오는 함수
 => year, day, weekday(요일(0~6으로 표현)), dayofweek(1~7로 표현) 등도 사용가능
+
+SELECT ADDDATE(curdate(), INTERVAL 6 MONTH);
+=> 현재 날짜에 6개월 후
+=> SUBDATE로 하게 되면 6개월 전
+
+SELECT ADDTIME(CURTIME(), '1:0:0')
+=> 현재 시간에 1시간 더하기
+=> 1:0:0 (시:분:초)
+=> SUBTIME 하면 1시간전
 ```
 
 ##### 정렬 관련 SELECT문
@@ -193,7 +202,7 @@ SELECT user():
 SELECT empno, ename, CONCAT('연 봉', ' ',sal * 12 ) AS 연봉  FROM emp;
 => 문자열이나 필드를 연결하기 위해서는 concat 사용
 
-SELECT CONCAT('-','2021','11','11' ); // 2021-11-11
+SELECT CONCAT('-','2021','11','11' ); -- 2021-11-11
 => 문자열 사이사이를 첫번째 인수로 구분
 
 SELECT COUNT(*) FROM employees WHERE gender = 'f' AND (YEAR(hire_date) = 1987 OR YEAR(hire_date) = 1989);
@@ -201,9 +210,9 @@ SELECT COUNT(*) FROM employees WHERE gender = 'f' AND (substring(hire_date, 1, 4
 => 위아래 쿼리는 같은 결과를 냄
 => substring함수는 첫번째 인자로 값, 두번째인자로 시작 위치, 세번째인자로 잘라 낼 갯수를 의미
 
-SELECT CAST('2020-10-19 12:35:29.123' AS DATE); // 2020-10-19
-SELECT CAST('2020-10-19 12:35:29.123' AS TIME); // 12:35:29
-SELECT CAST('2020-10-19 12:35:29.123' AS DATETIME); // 2020-10-19 12:35:29
+SELECT CAST('2020-10-19 12:35:29.123' AS DATE); -- 2020-10-19
+SELECT CAST('2020-10-19 12:35:29.123' AS TIME); -- 12:35:29
+SELECT CAST('2020-10-19 12:35:29.123' AS DATETIME); -- 2020-10-19 12:35:29
 => 형전환 함수(CAST)
 
 set @myval=10;
@@ -238,6 +247,39 @@ SELECT BIT_LENGTH('abc'), CHAR_LENGTH('abc'), LENGTH('abc');
 => BIT_LENGTH는 데이터 저장에 필요한 비트 수
 => CHAR_LENGTH는 문자열 길이
 => LENGTH는 차지하는 byte 수
+
+SELECT ELT(1, '사과', '바나나', '딸기');  -- 사과
+=> 문자열 찾는 함수,
+=> 첫번째 인수는 찾을 위치(1부터시작), 나머지 인수는 문자열
+=> 없을 시 NULL
+
+SELECT FIELD ('둘', '하나', '둘', '셋'); -- 2
+=> 문자열 위치를 찾는 함수
+=> 첫번째 인수는 찾을 문자열, 나머지 인수는 문자열
+=> 없을 시 0
+
+SELECT FIND_IN_SET('둘', '하나,둘,셋,넷'); -- 
+=> 구분자로 구별된 하나의 문자열에서 첫번째 인수 찾기
+=> 없으면 0
+
+SELECT INSTR('하나둘셋', 둘); -- 3
+=> 첫번째 인수 문자열에서 두번째 인수 찾기
+=> 없으면 0
+
+SELECT LTRIM('       왼쪽   *      '); -- 왼쪽 공백 제거
+SELECT RTRIM('    *   오른쪽         '); -- 오른쪽 공백 제거
+SELECT TRIM('       *양쪽*        '); -- 양쪽 공백 제거
+
+SELECT REPLACE('이것이 mysql이다', '이것이', 'This is');
+=> 첫번째 인수에서 두번째 인수를 찾아 세번째 인수로 변경
+
+SELECT ename, deptno FROM emp WHERE deptno = 10
+UNION ALL -- 그냥 union이면 중복제거
+SELECT dname, deptno FROM dept;
+=> 검색등에서 여러 테이블에서 검색관련 내용을 가져오기 위해서 사용
+=> 가져오려는 데이터의 타입과, 위치, 갯수만 맞으면 가능
+=> ename과 dname은 타입과 위치가 맞고 전체 가져오려는 필드가 2개씩이라 가능
+=> 자기자신도 union 가능
 ```
 
 ##### Join 연산
@@ -407,6 +449,71 @@ TRUNCATE TABLE 테이블명;
 => 테이블 구조만 남기고 모든 데이터 삭제
 ```
 
+#### IF문
+- IF문을 끝내기 위해선 END IF를 붙여줘야함
+```
+CREATE OR REPLACE PROCEDURE ifproc(IN num INT)
+BEGIN 
+	if num % 2 = 0 then
+		SELECT '짝수 입니다';
+	else
+		SELECT '홀수 입니다';
+	END if;
+END $$
+=> else if를 쓸때는 ELSEIF로 붙여줘야함
+```
+
+#### WHILE문
+- IF문을 끝내기 위해선 END WHILE를 붙여줘야함
+```
+while(조건식) DO
+	쿼리문;
+END while;
+```
+
+#### Label
+- loop를 중간에 멈추거나(break) 생략하고 처리할 때(continue) 사용
+- iterate : continue
+- leave : break
+
+##### leave
+```
+mywhile: --라벨설정
+    while(조건식) DO
+	    쿼리문;
+        leave mywhile;
+    END while;
+```
+
+##### iterate
+```
+mywhile: --라벨설정
+    while(조건식) DO
+	    쿼리문;
+        iterate mywhile;
+    END while;
+```
+
+#### repeat until
+- repeat 조건이 거짓인동안 수행
+- 최소 1회이상 수행(do - while문)
+```
+repeat
+    쿼리문
+until 조건문 -- 여기에 ;붙이면 안됨
+END repeat;
+```
+
+#### loop
+- 무조건 무한루프라서 라벨설정이 필수
+```
+mywhile: --라벨설정 필수
+    loop
+	    쿼리문;
+        leave mywhile;
+    END loop;
+```
+
 ### Transaction(트랜잭션)
 - 필요한  동작이 하나의 목적을 위해 한꺼번에 수행되는 것
 - Ex) 은행 A DB에서 돈이 나갔음을 저장하면서 은행 B DB에는 입금되었음을 저장
@@ -454,6 +561,185 @@ PREPARE myQuery FROM 'SELECT * FROM 테이블 WHERE 필드명=? and 필드명=?'
 EXECUTE myQuery USING @a @mybal;
 => PREPARE로 쿼리를 myQuery에 저장해놓고
 EXECUTE로 실행시키는데 ?에는 USING에 사용한 변수를 넣음
+```
+
+### Procedure(프로시저)
+- 자바스크립트 함수 : 프로시저와 함수를 합침
+- 프로시저: 값반환을 못함, 함수는 반드시 값을 반환함
+- 프로시저는 {} 없이 begin - end안에 입력
+```
+delimiter // -- ;으로 프로시저의  끝이 안나게하면서 //로 끝내줘야함(다른 문자 가능)
+=> 작업 끝나고 delimiter ;로 다시 변경
+
+CREATE PROCEDURE p1()
+BEGIN
+    DECLARE 변수명 변수타입 DEFAULT 값 --변수 설정
+    SET 변수명 = 값 -- 변수에 값 넣기
+END; //
+=> 프로시저 생성
+
+CALL pl() //
+=> 프로시저 실행
+
+DROP PROCEDURE p1;
+=>  프로시저 삭제
+
+CREATE OR REPLACE  PROCEDURE p1()
+BEGIN
+	SELECT CURDATE(), NOW();
+END; //
+=> procedure는 수정하려면 삭제하고 다시 만들어야하는데 매번 삭제하는것 보다 OR REPLACE를 붙여주면 만약 프로시저가 없다면 만들고 있다면 수정한다.
+
+CREATE or REPLACE PROCEDURE p2(IN a int)
+BEGIN
+	SET a = a + 5;
+	SELECT a;
+END //
+CALL p2(10) //
+=> 파라미터 쓸 때 IN, OUT, INOUT 중에 선택, IN 예제
+=> IN : 파라미터 값을 외부로부터 입력받기 위한 용도
+=> OUT : 파라미터를 통해 외부로 값을 전달하고자 하는 용도
+=> INOUT : 입력과 출력을 동시에 사용하고자 하는 용도
+
+CREATE OR replace PROCEDURE p3(OUT result INT)
+   BEGIN
+   	SET result = 10;
+   END //
+SET @a= 0 //
+call proc4(@a) //
+select @a
+=> OUT 예제
+=> 매개변수에 out을 주면 call 할때 변수를 넣어서 그 변수에 값을 넣음
+
+CREATE OR REPLACE PROCEDURE swap(INOUT x INT, INOUT y INT)
+BEGIN
+	DECLARE temp INT;
+	SET temp = x;
+	SET x = y;
+	SET y = temp;
+END //
+SET @X = 10//
+SET @Y = 20//
+CALL swap(@X, @Y)//
+SELECT @X, @Y //
+=> INOUT 예제
+```
+
+### 함수
+- 함수는 변수 앞에 아무 것도 붙이면 안됨
+- 함수는 처리한 값을 반환할 수 있기 때문에 OUT의 의미가 없고 반환 값은 한개만 가능함
+```
+delimiter //
+
+CREATE OR REPLACE FUNCTION 함수명(파라미터)
+RETURNS 타입
+BEGIN
+	RETURN 값; -- 값은 하나만 반환
+END//
+=> 주의사항 : 파라미터 앞에 in, out, inout 안붙임
+=> 함수는 파라미터를 통해서 값을 입력만 받음
+=> 반환값을 활용
+=> 호출시 call 사용 x select 사용
+
+SELECT myfn();
+=> 함수호출
+
+CREATE OR REPLACE FUNCTION fnDname(pdeptno INT)
+RETURNS VARCHAR(30)
+BEGIN
+	DECLARE vdname VARCHAR(30);
+	SELECT dname
+	INTO vdname -- 검색결과를 vdname 변수에 넣기
+	FROM dept 
+	WHERE deptno= pdeptno;
+	
+	RETURN vdname;
+END //
+SELECT empno, ename, fnDname(deptno) FROM emp //
+```
+
+### 에러처리
+- 오류가 발생 시 처리
+- 에러코드는 에러를 발생시켜보면 ERROR 에러코드 형식으로 에러가 나기때문에 해당 에러코드를 사용
+```
+CREATE OR REPLACE PROCEDURE errorProc()
+BEGIN
+	DECLARE CONTINUE handler FOR 1146 SELECT '테이블이 존재하지 않습니다' AS 메시지; -- 에러처리
+	SELECT * FROM tb_test;
+END$$
+
+CALL errorproc() $$
+
+
+USE sqldb$$
+CREATE OR REPLACE PROCEDURE errorProc2()
+BEGIN
+	DECLARE CONTINUE handler FOR SQLEXCEPTION 
+	BEGIN
+		SELECT '오류발생' AS 메시지;
+		SHOW ERRORS;
+		ROLLBACK; 
+	END;
+	INSERT INTO usertbl VALUES('LSG','이상구','1988','서울',NULL,NULL, 170, CURRENT_DATE());
+END$$
+CALL errorproc2() $$
+```
+
+### 커서
+- 데이터를 SELECT 해서 가져오면 그 데이터를 접근하는 객체
+- 여러 데이터를 가져와도 접근할 수 있음
+```
+declare 커서명 cursor for 쿼리;
+=> 커서 선언
+
+open 커서명
+=> 커서 오픈
+
+fetch 커서명 into 변수1, 변수2, ...
+=> 끝을 알려주지 않고 예외를 발생시킴
+=> 예외에서 종료 변수에 값을 바꿔서 강제로 종료 시키게 함
+
+close 커서명
+=> 커서 닫기
+
+CREATE OR REPLACE PROCEDURE cursor_proc()
+BEGIN
+	DECLARE vname VARCHAR(20);
+	DECLARE endflag INT DEFAULT 0;
+	-- DECLARE vname VARCHAR(20);
+	
+	-- 커서 객체 생성
+	DECLARE mycursor CURSOR for
+		SELECT ename FROM emp;
+		
+	-- 예외처리객체 선언
+	DECLARE CONTINUE handler FOR NOT FOUND SET endflag= 1;
+	-- 더이상 데이터가 없을 때 예외를 발생시켜 endflag를 1로 변경
+	OPEN mycursor;
+	
+	repeat
+		fetch mycursor INTO vname;
+		SELECT vname;
+	until endflag=1 END repeat;
+	
+	close mycursor;
+END$$
+
+CALL cursor_proc() $$
+=> emp 테이블의 데이터를 다 불러와서 뿌리기
+```
+
+### VIEW
+- 가상테이블을 생성
+- AS 다음 쿼리를 통해서 생성
+```
+CREATE OR REPLACE VIEW v_customer AS
+SELECT shippeddate, customername, addressline1, d.productname,
+c.quantityordered, c.priceeach
+FROM orders a
+LEFT OUTER JOIN customers b ON a.customernumber = b.customernumber
+LEFT outer JOIN orderdetails c ON a.ordernumber= c.ordernumber
+LEFT OUTER JOIN products d ON c.productCode=d.productCode;
 ```
 
 ## Ajax
