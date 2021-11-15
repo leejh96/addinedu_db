@@ -777,3 +777,52 @@ function loadDoc() {
     xhttp.send();
 }
 ```
+## MongoDB(NoSQL DB)
+- MongDB는 데이터 저장 관리만 가능
+- 일반적인 DB가 갖고 있는 성격인 무결성, 중복성배제, 일관성과 같은 성격을 갖고 있지 않음
+- 일관성을 요하는 은행업무와 같은 곳에 사용하기엔 어려움이 있음
+- 대소문자 구별
+- Collection<=>Table, row<=>Document
+
+### MongoDB 명령어
+- 나를 지칭하는 것이 db
+```
+use DB이름;
+=> db사용 및 없을 때 생성
+
+show collections;
+=> 컬렉션 확인
+
+db.createCollection('컬렉션이름');
+=> 컬렉션 생성
+
+db.컬렉션이름.insert({name : '홍길동', age: 23, gender:'M'});
+=> 데이터 삽입
+
+db.컬렉션이름.find({ name : '홍길동'})
+=> 데이터 찾기, 매개변수 없으면 전체 데이터 불러옴
+=> LIKE와 비슷한 기능을 위해서는 정규표현식을 사용해야 함
+
+db.컬렉션이름.update({ name: '홍길동'}, {$set : { age:40, gender: 'F'}});
+=> 첫번째 json에는 바꾸고자 할 위치를 나타내며, 두번째 json으로 바꿀값을 설정
+=> 값을 변경 시 $set을 사용하여 표현
+
+db.컬렉션이름.remove({ name : '홍길동});
+=> 매개변수로 특정 데이터 지정하여 삭제
+=> 매개변수를 주지 않는다면 모든 데이터 삭제
+
+db.customSequence.findAndModify({query : {_id : 'board'}, update: {$inc : {seq:1}}, new:true})
+=> query로 찾을 데이터 검색 후 update로 수정, new로 수정된 데이터 표현(없으면 수정전 데이터 표현)
+```
+### MongDB 조건부여
+
+|조건|내용|
+|:---:|:---:|
+|$eq|(equals) 주어진 값과 일치하는 값|
+|$gt|(greater than) 주어진 값보다 큰 값|
+|$gte|(greather than or equals) 주어진 값보다 크거나 같은 값|
+|$lt|(less than) 주어진 값보다 작은 값|
+|$lte|(less than or equals) 주어진 값보다 작거나 같은 값|
+|$ne|(not equal) 주어진 값과 일치하지 않는 값|
+|$in|주어진 배열 안에 속하는 값|
+|$nin|주어진 배열 안에 속하지 않는 값|

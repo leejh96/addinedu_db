@@ -1,14 +1,40 @@
 {
+  "name": "addinedu_db",
+  "description": "- 대량의 데이터 저장소\r     - 일관성 : 데이터를 파일로 저장하게 되어 특정 파일에 실수로 데이터를 고치지 못했을 경우 일관성이 깨졌다고 할 수 있음\r     - 무결성 : 한쪽 데이터가 바뀌었을 경우 같은 참조하는 다른 데이터도 함께 바뀌는 성질",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leejh96/addinedu_db.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leejh96/addinedu_db/issues"
+  },
+  "homepage": "https://github.com/leejh96/addinedu_db#readme",
+  "scripts": {
+    "dev": "concurrently \"set PORT=4000 && nodemon project/bin/www\" \"npm start --prefix client\""
+  },
   "dependencies": {
+    "concurrently": "^6.4.0",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
+    "express-generator": "^4.16.1",
+    "http-errors": "~1.6.3",
+    "mongoose": "^6.0.12",
+    "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "url-search-params": "^1.1.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.14"
-  },
-  "scripts": {
-    "start": "nodemon test/add"
   }
 }
