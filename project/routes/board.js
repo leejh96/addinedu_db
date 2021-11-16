@@ -23,6 +23,7 @@ router.get('/:id', (req, res, next) => {
         connection.query(sql, (err, result) => {
             console.log(result);
             res.send(JSON.stringify([result[0]]));
+            connection.release();
         })
     })
 })
@@ -36,6 +37,7 @@ router.get('/list/:page', (req, res, next) => {
         const sql = `select * from board limit ${(page - 1) * 5}, 5`;
         connection.query(sql, (err, result) => {
             res.send(JSON.stringify(result));
+            connection.release();
         })
     })
 })
@@ -50,6 +52,7 @@ router.get('/edit/:id', (req, res, next) => {
         const sql = `select * from board where id = ${id}`;
         connection.query(sql, (err, result) => {
             res.send(JSON.stringify(result[0]));
+            connection.release();
         })
     })
 })
@@ -62,7 +65,8 @@ router.post('/insert', (req, res, next) => {
         }
         const sql = `insert into board(id, title, writer, contents) values(${Math.floor(Math.random() * 100000)},'${title}', '${writer}', '${contents}')`;
         connection.query(sql, (err, result) => {
-            res.send('ok')
+            res.send(JSON.stringify(result));
+            connection.release();
         })
     })
 });
@@ -82,6 +86,7 @@ router.put('/:id', (req, res, next) => {
                     where id = ${id}`;
         connection.query(sql, (err, result) => {
             res.send('ok');
+            connection.release();
         })
     })
 })
@@ -95,6 +100,7 @@ router.delete('/:id', (req, res, next) => {
         const sql = `delete from board where id =${id}`;
         connection.query(sql, (err, result) => {
             res.send('ok');
+            connection.release();
         })
     })
 })

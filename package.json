@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/leejh96/addinedu_db#readme",
   "scripts": {
-    "dev": "concurrently \"set PORT=4000 && nodemon project/bin/www\" \"npm start --prefix client\""
+    "project": "concurrently \"set PORT=4000 && nodemon project/bin/www\" \"npm start --prefix project/client\"",
+    "start": "set PORT=4000 && nodemon project2/bin/www"
   },
   "dependencies": {
     "concurrently": "^6.4.0",
