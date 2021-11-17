@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-sm bg-light navbar-light">
+    <ul class="navbar-nav">
+        <li class="nav-item 
+            <%if(menu==='board'){%> active <%}%>
+            active">
+            <a class="nav-link" href="/board/list/1">게시판</a>
+        </li>
+        <li class="nav-item 
+    <%if(menu==='member'){%> active <%}%>
+    ">
+            <a class="nav-link" href="/member/register">Signup</a>
+        </li>
+        <li class="nav-item">
+            <%if(!userInfo.userid){%>
+                <a class="nav-link" href="/member/logon">Login</a>
+                <%}else{%>
+                    <a class="nav-link" href="/member/logout">Logout</a>
+                    <%}%>
+        </li>
+    </ul>
+</nav>

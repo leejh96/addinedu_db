@@ -9,7 +9,12 @@ const pool = mysql.createPool({
 
 //http://127.0.0.1:4000/member/register_form 
 router.get("/register", (req, res) => {
-  res.render("member/member_register"); //views/member/member_register.ejs 를 불러와서 화면에 보이기 
+  const userInfo = {
+    userid: req.session.userid,
+    username: req.session.username,
+    email: req.session.email
+  }
+  res.render("member/member_register", userInfo); //views/member/member_register.ejs 를 불러와서 화면에 보이기 
 });
 
 router.get('/logon', (req, res) => {
@@ -29,6 +34,12 @@ router.post("/register", (req, res) => {
     address1,
     address2
   } = req.body
+
+  const userInfo = {
+    userid: req.session.userid,
+    username: req.session.username,
+    email: req.session.email
+  }
   pool.getConnection((err, connection) => {
     const sql = `
         insert into tb_member(user_id, username, password, email, phone, nickname, 
@@ -47,7 +58,6 @@ router.post("/register", (req, res) => {
 });
 
 router.post('/logon', (req, res) => {
-  console.log(req);
   const { userid, password } = req.body;
   pool.getConnection((err, connection) => {
     const sql = `select * from tb_member where user_id='${userid}' and password='${password}'`;
@@ -58,11 +68,19 @@ router.post('/logon', (req, res) => {
         if (results.length === 0) {
           res.send({ success: false });
         } else {
+          req.session.userid = results[0].user_id;
+          req.session.username = results[0].username;
+          req.session.email = results[0].email;
           res.send({ success: true });
         }
       }
     });
   });
+});
+
+router.get('/logout', (req, res) => {
+  req.session.destroy(); //세션제거
+  res.redirect('/');
 });
 
 router.use("/idcheck", (req, res) => {
@@ -74,8 +92,6 @@ router.use("/idcheck", (req, res) => {
         console.log("err : " + err);
       }
       else {
-        console.log(sql)
-        console.log(rows);
         if (rows[0]['cnt'] === 0) {
           res.send({ result: 'success' });
         } else {

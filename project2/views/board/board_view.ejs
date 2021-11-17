@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Insert title here</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+  <%- include('../common/header', { menu : 'member' , userInfo})%>
+    <div class="container" style="margin-top:20px">
+      <h2>게시판 상세보기</h2>
+      <p></p>
+      <form>
+        <table class="table">
+          <colgroup>
+            <col width="15%" />
+            <col width="35%" />
+            <col width="15%" />
+            <col width="25%" />
+            <col width="10%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>제목</th>
+              <th>내용</th>
+              <th>작성자</th>
+              <th>작성일자</th>
+              <th>조회수</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%for(let i of results){%>
+              <tr>
+                <td>
+                  <%=i.title%>
+                </td>
+                <td>
+                  <%=i.contents%>
+                </td>
+                <td>
+                  <%=i.username%>
+                </td>
+                <td>
+                  <%=i.date%>
+                </td>
+                <td>
+                  <%=i.hit%>
+                </td>
+              </tr>
+              <%}%>
+
+          </tbody>
+        </table>
+
+        <div class="container" style="text-align:right">
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary">답글</button>&nbsp;&nbsp;
+            <button type="button" class="btn btn-primary">수정</button>&nbsp;&nbsp;
+            <button type="button" class="btn btn-danger">삭제</button>&nbsp;&nbsp;
+            <button type="button" class="btn btn-primary">목록</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+</body>
+
+</html>

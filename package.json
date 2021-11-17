@@ -19,7 +19,8 @@
   "homepage": "https://github.com/leejh96/addinedu_db#readme",
   "scripts": {
     "project": "concurrently \"set PORT=4000 && nodemon project/bin/www\" \"npm start --prefix project/client\"",
-    "start": "set PORT=4000 && nodemon project2/bin/www"
+    "start": "set PORT=4000 && nodemon project2/bin/www",
+    "example": "nodemon example/day7/promise"
   },
   "dependencies": {
     "concurrently": "^6.4.0",
@@ -29,10 +30,13 @@
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-generator": "^4.16.1",
+    "express-session": "^1.17.2",
     "http-errors": "~1.6.3",
     "mongoose": "^6.0.12",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "session-file-store": "^1.5.0",
     "url-search-params": "^1.1.0"
   },
   "devDependencies": {
